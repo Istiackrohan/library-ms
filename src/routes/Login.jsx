@@ -1,18 +1,29 @@
 import { Link, Navigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function Login() {
-    const matchCredentials = () => {
-        const email = document.getElementById("login-email").value;
-        const password = document.getElementById("login-password").value;
+    const [user, setUser] = useState(null);
+    const [error, setError] = useState(null);
 
-        if (email == "library@10minuteschool.com" && password == "10msLibrary") {
-            console.log("Admin Credential matched!");
-            return <Navigate to="/admin" />;
-        } else {
-            alert("Credentials didn't match!")
-        }        
-        console.log(email, password);
-    };
+    async function matchCredentials(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const email = formData.get('login-email');
+        const password = formData.get('login-password');
+        try {
+            let user = await login({ email, password });
+            setUser(user);
+        } catch (error) {
+            setError(error);
+        }
+    }
+
+    const login = ( email, password ) => {
+        if (email == 'rohan@abc.com' && password == '123') {
+            console.log("Login successfull!");
+        }
+    }
+    
 
     return (
         <>
@@ -20,13 +31,17 @@ export default function Login() {
                 <h1>Login here</h1>
             </div>
             <div className="form-container">
-                <p>Your Email:</p>
-                <input type="email" placeholder="abc@xyz.com" name="" id="login-email" />
-                <p>Password</p>
-                <input type="password" placeholder="******" name="" id="login-password" /><br />
-                <button onClick={matchCredentials} type="submit">Login</button>
-                <br />
-                <Link to={`/register`}>Do not have an account?</Link>
+                {error && <p>{error.message}</p>}
+                {user && <Navigate to="/admin" replace={true} />}
+                <form onSubmit={matchCredentials}>
+                    <p>Your Email:</p>
+                    <input type="email" placeholder="abc@xyz.com" name="login-email" />
+                    <p>Password</p>
+                    <input type="password" placeholder="******" name="login-password" /><br />
+                    <button type="submit">Login</button>
+                    <br />
+                    <Link to={`/register`}>Do not have an account?</Link>
+                </form>
             </div>
         </>
     );
